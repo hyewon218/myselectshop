@@ -9,6 +9,9 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.ArrayList;
+import java.util.List;
+
 @Service
 @RequiredArgsConstructor
 public class ProductService {
@@ -40,5 +43,17 @@ public class ProductService {
         product.update(requestDto);
 
         return new ProductResponseDto(product);
+    }
+
+    public List<ProductResponseDto> getProducts() {
+        List<Product> productList = productRepository.findAll();
+        List<ProductResponseDto> responseDtoList = new ArrayList<>();
+
+        for (Product product : productList) {
+            // product 를 하나씩 뽑으면서 ProductResponseDto 생성자의 parameter 로 전달해줘서 ProductResponseDto 객체가 만들어 진다.
+            // 만들어진 ProductResponseDto 객체는 responseDtoList 에 들어간다.
+            responseDtoList.add(new ProductResponseDto(product)); // 생성자 사용
+        }
+        return responseDtoList;
     }
 }
