@@ -4,6 +4,7 @@ import com.sparta.myselectshop.dto.ProductMypriceRequestDto;
 import com.sparta.myselectshop.dto.ProductRequestDto;
 import com.sparta.myselectshop.dto.ProductResponseDto;
 import com.sparta.myselectshop.entity.Product;
+import com.sparta.myselectshop.entity.User;
 import com.sparta.myselectshop.naver.dto.ItemDto;
 import com.sparta.myselectshop.repository.ProductRepository;
 import lombok.RequiredArgsConstructor;
@@ -20,13 +21,34 @@ public class ProductService {
     private final ProductRepository productRepository;
     public static final int MIN_MY_PRICE = 100;
 
-    public ProductResponseDto createProduct(ProductRequestDto requestDto) {
+    public ProductResponseDto createProduct(ProductRequestDto requestDto, User user) {
         // 받아온 Dto 를 저장할 Entity 객체로 만들어준다.
         // 데이터가 채워지면서 객체 하나가 만들어지면서 저장
         // 저장이 되면서 반환된 데이터 받아주고 return
-        Product product = productRepository.save(new Product(requestDto));
+        Product product = productRepository.save(new Product(requestDto, user));
 
         return new ProductResponseDto(product); // 생성자 parameter 에 product 넣어 보냄
+    }
+
+    public List<ProductResponseDto> getProducts(User user) {
+        List<Product> productList = productRepository.findAllByUser(user);
+        List<ProductResponseDto> responseDtoList = new ArrayList<>();
+
+        for (Product product : productList) {
+            responseDtoList.add(new ProductResponseDto(product));
+        }
+        return responseDtoList;
+    }
+
+    // Admin 계정 모든 상품 조회 기능 추가
+    public List<ProductResponseDto> getAllProducts() {
+        List<Product> productList = productRepository.findAll();
+        List<ProductResponseDto> responseDtoList = new ArrayList<>();
+
+        for (Product product : productList) {
+            responseDtoList.add(new ProductResponseDto(product));
+        }
+        return responseDtoList;
     }
 
     @Transactional
@@ -51,7 +73,7 @@ public class ProductService {
         List<ProductResponseDto> responseDtoList = new ArrayList<>();
 
         for (Product product : productList) {
-            // product 를 하나씩 뽑으면서 ProductResponseDto 생성자의 parameter 로 전달해줘서 ProductResponseDto 객체가 만들어 진다.
+            // product 를 하나씩 뽑으면서 ProductResponseDto 생성자의 parameter 로 전달해줘서 ProductResponseDto 객체가 만들어진다.
             // 만들어진 ProductResponseDto 객체는 responseDtoList 에 들어간다.
             responseDtoList.add(new ProductResponseDto(product)); // 생성자 사용
         }
